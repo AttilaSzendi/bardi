@@ -1919,6 +1919,32 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
@@ -1933,7 +1959,12 @@ __webpack_require__.r(__webpack_exports__);
     return {
       seats: [],
       selectedSeats: [],
-      maxSelection: 2
+      maxSelection: 2,
+      selecting: true,
+      reserving: true,
+      email: '',
+      errorMessage: '',
+      reservationId: null
     };
   },
   methods: {
@@ -1956,6 +1987,43 @@ __webpack_require__.r(__webpack_exports__);
     },
     isSelected: function isSelected(seatId) {
       return this.selectedSeats.includes(seatId);
+    },
+    reserve: function reserve() {
+      this.selecting = false;
+    },
+    sendReservation: function sendReservation() {
+      var _this2 = this;
+
+      this.selecting = false;
+      axios.post('/api/reservations', {
+        email: this.email,
+        selectedSeats: this.selectedSeats
+      }).then(function (response) {
+        _this2.reserving = false;
+        _this2.reservationId = response.data.data.id;
+      })["catch"](function (error) {
+        if (error.response.data.errors.selectedSeats[0] !== 'undefined') {
+          _this2.errorMessage = error.response.data.errors.selectedSeats[0];
+        }
+      });
+    },
+    pay: function pay() {
+      var _this3 = this;
+
+      axios.put('/api/reservations/' + this.reservationId).then(function (response) {
+        _this3.selecting = true;
+        console.log('siker...');
+      })["catch"](function (error) {});
+    },
+    cancel: function cancel() {
+      this.selecting = true;
+      this.email = '';
+      this.errorMessage = '';
+    }
+  },
+  computed: {
+    hasSelection: function hasSelection() {
+      return this.selectedSeats.length > 0;
     }
   }
 });
@@ -37506,31 +37574,145 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("p", { staticClass: "alert-info" }, [
-      _vm._v("Egyszerre csak " + _vm._s(_vm.maxSelection) + " szék foglalható!")
-    ]),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticStyle: { display: "flex" }, attrs: { id: "room" } },
-      _vm._l(_vm.seats, function(item) {
-        return _c(
-          "div",
-          {
-            key: item.id,
-            staticClass: "seat",
-            class: { selected: _vm.isSelected(item.id) },
-            on: {
-              click: function($event) {
-                return _vm.select(item.id)
-              }
-            }
-          },
-          [_vm._v("\n            " + _vm._s(item.id) + "\n        ")]
-        )
-      }),
-      0
-    )
+    _vm.selecting
+      ? _c("div", [
+          _c("p", { staticClass: "alert-info" }, [
+            _vm._v(
+              "Egyszerre csak " + _vm._s(_vm.maxSelection) + " szék foglalható!"
+            )
+          ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticStyle: { display: "flex" }, attrs: { id: "room" } },
+            _vm._l(_vm.seats, function(item) {
+              return _c(
+                "div",
+                {
+                  key: item.id,
+                  staticClass: "seat",
+                  class: { selected: _vm.isSelected(item.id) },
+                  on: {
+                    click: function($event) {
+                      return _vm.select(item.id)
+                    }
+                  }
+                },
+                [
+                  _vm._v(
+                    "\n                " + _vm._s(item.id) + "\n            "
+                  )
+                ]
+              )
+            }),
+            0
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
+                  value: _vm.hasSelection,
+                  expression: "hasSelection"
+                }
+              ],
+              staticClass: "btn btn-primary",
+              on: { click: _vm.reserve }
+            },
+            [_vm._v("Kiválaszt")]
+          )
+        ])
+      : _c("div", [
+          _c("div", [
+            _vm._v(
+              "\n            A választott szék(ek): " +
+                _vm._s(_vm.selectedSeats) +
+                "\n        "
+            )
+          ]),
+          _vm._v(" "),
+          _vm.reserving
+            ? _c("div", [
+                _c("div", [
+                  _c("label", { attrs: { for: "email" } }, [
+                    _vm._v("Email cím:")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.email,
+                        expression: "email"
+                      }
+                    ],
+                    attrs: {
+                      id: "email",
+                      type: "text",
+                      name: "email",
+                      placeholder: "email",
+                      required: ""
+                    },
+                    domProps: { value: _vm.email },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.email = $event.target.value
+                      }
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  { staticClass: "btn btn-danger", on: { click: _vm.cancel } },
+                  [_vm._v("Mégsem")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    on: { click: _vm.sendReservation }
+                  },
+                  [_vm._v("Foglalás véglegesítése")]
+                )
+              ])
+            : _c("div", [
+                _c("p", [_vm._v("hátralévő idő: 1perc, 23mp")]),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  { staticClass: "btn btn-primary", on: { click: _vm.pay } },
+                  [_vm._v("Fizetés")]
+                )
+              ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
+                  value: _vm.errorMessage !== "",
+                  expression: "errorMessage !== ''"
+                }
+              ]
+            },
+            [
+              _c("p", { staticClass: "alert-danger" }, [
+                _vm._v(_vm._s(_vm.errorMessage))
+              ])
+            ]
+          )
+        ])
   ])
 }
 var staticRenderFns = []

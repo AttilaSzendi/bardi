@@ -10944,3 +10944,11 @@ a.text-dark:focus {
   background: #a5beef;
 }
 
+.seat.paid {
+  background: #ec2323;
+}
+
+.seat.reserved {
+  background: #bd6d6d;
+}
+
