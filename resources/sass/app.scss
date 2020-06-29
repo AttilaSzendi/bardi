@@ -6,3 +6,19 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+#room {
+    display: flex;
+}
+
+.seat {
+    width: 30px;
+    border: 1px solid #626b6f;
+    margin: 3px;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+}
+
+.seat.selected {
+    background: #a5beef;
+}
