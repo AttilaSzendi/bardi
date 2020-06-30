@@ -14,7 +14,9 @@ class SeatController extends Controller
      */
     public function index()
     {
-        return SeatResource::collection(Seat::query()->with('reservations')->get());
+        return SeatResource::collection(
+            Seat::query()->with('reservations')->get()
+        );
     }
 
     /**
@@ -22,9 +24,9 @@ class SeatController extends Controller
      */
     public function store()
     {
-        $seat = Seat::query()->create();
-
-        return new SeatResource($seat);
+        return new SeatResource(
+            Seat::query()->create()
+        );
     }
 
     /**

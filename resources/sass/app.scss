@@ -25,8 +25,10 @@
 
 .seat.paid {
     background: #ec2323;
+    cursor: not-allowed;
 }
 
 .seat.reserved {
     background: #bd6d6d;
+    cursor: not-allowed;
 }

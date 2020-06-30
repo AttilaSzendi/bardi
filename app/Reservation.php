@@ -26,15 +26,16 @@ class Reservation extends Model
      * @param array $seatIds
      * @return bool
      */
-    public static function isExistsWithSeats(array $seatIds)
+    public static function existsWithSeats(array $seatIds)
     {
         return static::query()
             ->where(function(Builder $query){
-                $query->where('is_paid', true);
-            })
-            ->orWhere(function(Builder $query){
-                $query->where('is_paid', false)
-                    ->where('created_at', '>=', now()->subMinutes(config('app.time_limit')));
+                $query
+                    ->where('is_paid', true)
+                    ->orWhere(function(Builder $query){
+                        $query->where('is_paid', false)
+                            ->where('created_at', '>=', now()->subMinutes(config('app.time_limit')));
+                    });
             })
         ->whereHas('seats', function(Builder $query) use ($seatIds) {
             $query->whereIn('id', $seatIds);

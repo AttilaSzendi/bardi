@@ -15,6 +15,8 @@ class ReservationController extends Controller
      */
     public function store(ReservationRequest $request)
     {
+        $request->merge(['is_paid' => false]);
+
         $reservation = Reservation::query()->create($request->all());
 
         $reservation->seats()->sync($request->get('selectedSeats'));
@@ -24,14 +26,14 @@ class ReservationController extends Controller
 
     /**
      * @param Reservation $reservation
-     * @return bool
+     * @return Reservation
      */
     public function update(Reservation $reservation)
     {
-        $success = $reservation->update(['is_paid' => true]);
+        $reservation->update(['is_paid' => true]);
 
         event(new ReservationHasFinished($reservation));
 
-        return $success;
+        return $reservation->fresh();
     }
 }

@@ -128,4 +128,34 @@ class ReservationTest extends TestCase
             'is_paid' => true
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function seats_can_be_reserved_if_the_selected_seats_are_free()
+    {
+        $seats = factory(Seat::class, 3)->create();
+
+        $reservation = factory(Reservation::class)->create([
+            'is_paid' => true
+        ]);
+
+        $reservation->seats()->sync([$seats[0]->id, $seats[2]->id]);
+
+        $response = $this->json('post', route('api:reservations.store'), [
+            'email' => 'asd@fake.com',
+            'selectedSeats' => [$seats[1]->id]
+        ]);
+
+        $response->assertCreated();
+
+        $this->assertDatabaseHas('reservations', [
+            'id' => 2
+        ]);
+
+        $this->assertDatabaseHas('reservation_seat', [
+            'reservation_id' => 2,
+            'seat_id' => $seats[1]->id,
+        ]);
+    }
 }

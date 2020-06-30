@@ -28,7 +28,7 @@ class SeatTest extends TestCase
     /**
      * @test
      */
-    public function seats_contains_reservations()
+    public function seats_contains_reservations_and_status_id()
     {
         $reservation = factory(Reservation::class)->create([
             'created_at' => now()->subMinutes(1),
@@ -39,7 +39,7 @@ class SeatTest extends TestCase
 
         $reservation->seats()->sync($seats->pluck('id'));
 
-        $response = $this->get(route('api:seats.index'))->dump();
+        $response = $this->get(route('api:seats.index'));
 
         $response->assertJsonStructure([
             'data' => [

@@ -16,7 +16,7 @@ class NotInProgress implements Rule
      */
     public function passes($attribute, $value)
     {
-        return !Reservation::isExistsWithSeats($value);
+        return !Reservation::existsWithSeats($value);
     }
 
     /**
@@ -26,6 +26,6 @@ class NotInProgress implements Rule
      */
     public function message()
     {
-        return 'A kiválasztott székek jelenleg nem választhatóak!';
+        return 'A kiválasztott szék(ek) jelenleg nem választható(ak)!';
     }
 }

@@ -1945,6 +1945,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
@@ -1968,9 +1970,13 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    select: function select(seatId) {
-      if (this.selectedSeats.includes(seatId)) {
-        var index = this.selectedSeats.indexOf(seatId);
+    select: function select(seat) {
+      if (seat.statusId !== 1) {
+        return;
+      }
+
+      if (this.selectedSeats.includes(seat.id)) {
+        var index = this.selectedSeats.indexOf(seat.id);
 
         if (index > -1) {
           this.selectedSeats.splice(index, 1);
@@ -1983,7 +1989,7 @@ __webpack_require__.r(__webpack_exports__);
         return;
       }
 
-      this.selectedSeats.push(seatId);
+      this.selectedSeats.push(seat.id);
     },
     isSelected: function isSelected(seatId) {
       return this.selectedSeats.includes(seatId);
@@ -2001,6 +2007,12 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (response) {
         _this2.reserving = false;
         _this2.reservationId = response.data.data.id;
+
+        _this2.selectedSeats.forEach(function (value) {
+          _this2.seats.find(function (item) {
+            return item.id === value;
+          }).statusId = 2;
+        });
       })["catch"](function (error) {
         if (error.response.data.errors.selectedSeats[0] !== 'undefined') {
           _this2.errorMessage = error.response.data.errors.selectedSeats[0];
@@ -2012,7 +2024,14 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.put('/api/reservations/' + this.reservationId).then(function (response) {
         _this3.selecting = true;
-        console.log('siker...');
+
+        _this3.selectedSeats.forEach(function (value) {
+          _this3.seats.find(function (item) {
+            return item.id === value;
+          }).statusId = 3;
+        });
+
+        _this3.selectedSeats = [];
       })["catch"](function (error) {});
     },
     cancel: function cancel() {
@@ -37591,10 +37610,14 @@ var render = function() {
                 {
                   key: item.id,
                   staticClass: "seat",
-                  class: { selected: _vm.isSelected(item.id) },
+                  class: {
+                    selected: _vm.isSelected(item.id),
+                    reserved: item.statusId === 2,
+                    paid: item.statusId === 3
+                  },
                   on: {
                     click: function($event) {
-                      return _vm.select(item.id)
+                      return _vm.select(item)
                     }
                   }
                 },
@@ -37685,7 +37708,13 @@ var render = function() {
                 )
               ])
             : _c("div", [
-                _c("p", [_vm._v("hátralévő idő: 1perc, 23mp")]),
+                _c("p", [_vm._v("2 perced van a vásárlás befejezéséig!")]),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  { staticClass: "btn btn-danger", on: { click: _vm.cancel } },
+                  [_vm._v("Mégsem")]
+                ),
                 _vm._v(" "),
                 _c(
                   "button",
