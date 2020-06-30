@@ -63,11 +63,11 @@ class ReservationTest extends TestCase
     /**
      * @test
      */
-    public function seats_can_be_reserved_if_there_is_reservation_in_progress_but_has_reached_the_time_period()
+    public function seats_can_be_reserved_even_if_there_is_reservation_in_progress_but_has_reached_the_time_period()
     {
         $seat = factory(Seat::class)->create();
 
-        $reservation = factory(Reservation::class)->create(['created_at' => now()->addMinutes(3)]);
+        $reservation = factory(Reservation::class)->create(['created_at' => now()->subMinutes(3)]);
         $reservation->seats()->sync([$seat->id]);
 
         $response = $this->json('post', route('api:reservations.store'), [
@@ -90,14 +90,14 @@ class ReservationTest extends TestCase
     /**
      * @test
      */
-    public function seats_cannot_be_reserved_if_one_of_the_selected_seat_is_reserved_and_paid()
+    public function seats_cannot_be_reserved_if_it_has_a_paid_reservation()
     {
         $seat = factory(Seat::class)->create();
 
         $reservation = factory(Reservation::class)->create([
-            'created_at' => now()->addMinutes(3),
-            'status_id' => Reservation::PAID
+            'is_paid' => true
         ]);
+
         $reservation->seats()->sync([$seat->id]);
 
         $response = $this->json('post', route('api:reservations.store'), [
@@ -117,7 +117,7 @@ class ReservationTest extends TestCase
      */
     public function reservation_can_be_paid_and_finalized()
     {
-        $reservation = factory(Reservation::class)->create(['status_id' => Reservation::RESERVED]);
+        $reservation = factory(Reservation::class)->create(['is_paid' => false]);
 
         $response = $this->json('put', route('api:reservations.update', ['reservation' => $reservation->id]));
 
@@ -125,7 +125,7 @@ class ReservationTest extends TestCase
 
         $this->assertDatabaseHas('reservations', [
             'id' => $reservation->id,
-            'status_id' => Reservation::PAID
+            'is_paid' => true
         ]);
     }
 }

@@ -15,8 +15,6 @@ class ReservationController extends Controller
      */
     public function store(ReservationRequest $request)
     {
-        $request->merge(['status_id' => Reservation::RESERVED]);
-
         $reservation = Reservation::query()->create($request->all());
 
         $reservation->seats()->sync($request->get('selectedSeats'));
@@ -30,7 +28,7 @@ class ReservationController extends Controller
      */
     public function update(Reservation $reservation)
     {
-        $success = $reservation->update(['status_id' => Reservation::PAID]);
+        $success = $reservation->update(['is_paid' => true]);
 
         event(new ReservationHasFinished($reservation));
 

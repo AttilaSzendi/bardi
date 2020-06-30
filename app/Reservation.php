@@ -2,18 +2,20 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * @property int id
  * @property string email
+ * @property string is_paid
+ * @property Carbon created_at
+ * @property string updated_at
  */
 class Reservation extends Model
 {
-    const RESERVED = 1;
-    const PAID = 2;
-
-    public $fillable = ['email', 'status_id'];
+    public $fillable = ['email', 'is_paid'];
 
     public function seats()
     {
@@ -28,11 +30,11 @@ class Reservation extends Model
     {
         return static::query()
             ->where(function(Builder $query){
-                $query->where('status_id', static::PAID);
+                $query->where('is_paid', true);
             })
             ->orWhere(function(Builder $query){
-                $query->where('status_id', static::RESERVED)
-                    ->where('created_at', '<', now()->addMinutes(2));
+                $query->where('is_paid', false)
+                    ->where('created_at', '>=', now()->subMinutes(config('app.time_limit')));
             })
         ->whereHas('seats', function(Builder $query) use ($seatIds) {
             $query->whereIn('id', $seatIds);

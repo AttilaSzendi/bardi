@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'time_limit' => env('TIME_LIMIT', 2),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

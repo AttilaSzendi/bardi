@@ -14,7 +14,7 @@ class SeatController extends Controller
      */
     public function index()
     {
-        return SeatResource::collection(Seat::all());
+        return SeatResource::collection(Seat::query()->with('reservations')->get());
     }
 
     /**

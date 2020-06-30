@@ -8,6 +8,6 @@ use Faker\Generator as Faker;
 $factory->define(Reservation::class, function (Faker $faker) {
     return [
         'email' => $faker->email,
-        'status_id' => Reservation::RESERVED
+        'is_paid' => false
     ];
 });

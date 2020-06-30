@@ -11,7 +11,7 @@ class CreateReservationsTable extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
             $table->string('email');
-            $table->unsignedInteger('status_id');
+            $table->unsignedInteger('is_paid')->default(false);
             $table->timestamps();
         });
     }
