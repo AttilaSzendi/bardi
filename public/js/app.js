@@ -37702,6 +37702,7 @@ var render = function() {
                   "button",
                   {
                     staticClass: "btn btn-primary",
+                    attrs: { disabled: _vm.email.length < 1 },
                     on: { click: _vm.sendReservation }
                   },
                   [_vm._v("Foglalás véglegesítése")]

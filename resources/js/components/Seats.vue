@@ -22,7 +22,7 @@
                 </div>
 
                 <button class="btn btn-danger" @click="cancel">Mégsem</button>
-                <button class="btn btn-primary" @click="sendReservation">Foglalás véglegesítése</button>
+                <button class="btn btn-primary" @click="sendReservation" :disabled="email.length < 1">Foglalás véglegesítése</button>
             </div>
             <div v-else>
                 <p>2 perced van a vásárlás befejezéséig!</p>
